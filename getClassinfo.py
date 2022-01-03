@@ -1,5 +1,4 @@
 from time import sleep
-from types import resolve_bases
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -26,23 +25,35 @@ while True:
         #we're ready to exit the loop.
         break
     
-url = rf"https://webapp4.asu.edu/catalog/course?r={class_code}"
 
-driver.get(url)
-sleep(2)
+def get_data(ccode):
+    url = rf"https://webapp4.asu.edu/catalog/course?r={ccode}"
+    driver.get(url)
+    sleep(2)
+    try:
+        noresults = driver.find_element(By.CLASS_NAME,"noResults")
+    except:
+        noresults=None
 
-found = driver.find_elements(By.XPATH,"/html/body/div[1]/div[4]/div[1]/div[3]/div[2]/div/div/div/div[2]/div[1]/span")
-try:
-    noresults = driver.find_element(By.CLASS_NAME,"noResults")
-except:
-    noresults=None
-
-if noresults:
-    print("NO CLASS FOUND WITH GIVEN CRITERIA.")
-else:
-    res_text = (found[0].text)
-    if "Seats Open" not in res_text:
-        print("Class not open!")
+    if noresults:
+        return -1
     else:
-        print(res_text)
-    print("----------------------------------------------")
+        found = driver.find_elements(By.XPATH,"/html/body/div[1]/div[4]/div[1]/div[3]/div[2]/div/div/div/div[2]/div[1]/span")
+        res_text = (found[0].text)
+        if "Seats Open" not in res_text:
+            return 0
+        else:
+            to_be_ret = res_text.splitlines()
+            return [to_be_ret[0],to_be_ret[3].strip()]
+
+seats_not_open = True
+init_data = get_data(class_code)
+if init_data==-1:
+    print("There are no results for this class code.")
+elif init_data==0:
+    print("Class not open.")
+else:
+    while seats_not_open:
+        data = get_data(class_code)
+        print(data[1])
+        print(data[0])
