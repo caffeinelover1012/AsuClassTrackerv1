@@ -38,13 +38,22 @@ def get_data(ccode):
     if noresults:
         return -1
     else:
-        found = driver.find_elements(By.XPATH,"/html/body/div[1]/div[4]/div[1]/div[3]/div[2]/div/div/div/div[2]/div[1]/span")
-        res_text = (found[0].text)
+
+        try:
+            found = driver.find_elements(By.XPATH,"/html/body/div[1]/div[4]/div[1]/div[3]/div[2]/div/div/div/div[2]/div[1]/span")
+            res_text = (found[0].text)
+        except:
+            return -1
         if "Seats Open" not in res_text:
             return 0
         else:
             to_be_ret = res_text.splitlines()
-            return [to_be_ret[0],to_be_ret[3].strip()]
+            class_det_idx = 2
+            for i in range(len(to_be_ret)):
+                if to_be_ret[i].startswith('Days'):
+                    class_det_idx=i+1
+                    break
+            return [to_be_ret[0],to_be_ret[class_det_idx].strip()]
 
 seats_not_open = True
 init_data = get_data(class_code)
@@ -53,7 +62,15 @@ if init_data==-1:
 elif init_data==0:
     print("Class not open.")
 else:
+    print("Got it! Now Tracking...")
+    print("Auto Refreshing Every 3 seconds...")
+    print("You will be notified if any seat opens up")
+    print("*****************************************")
     while seats_not_open:
         data = get_data(class_code)
         print(data[1])
         print(data[0])
+        print("-------------------------------------")
+        seats_not_open= int(data[0].split('Seats Open: ')[-1].split(' of')[0])==0
+        if(not seats_not_open):
+            print("Seats are Available!")
