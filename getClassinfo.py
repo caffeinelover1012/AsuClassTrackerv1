@@ -14,8 +14,8 @@ chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
 chrome_options.add_argument('--log-level=3')
 driver = webdriver.Chrome(options=chrome_options)
-
-url = r"https://webapp4.asu.edu/catalog/course?r=14731"
+class_code = '14731'
+url = rf"https://webapp4.asu.edu/catalog/course?r={class_code}"
 
 
 token = "2107768431:AAEjv9BXlO8R6m0i5mlp4nM2sb9rvs5brRk"
