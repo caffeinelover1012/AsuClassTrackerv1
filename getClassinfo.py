@@ -2,6 +2,7 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from win10toast import ToastNotifier
 
 chrome_options = Options()
 chrome_options.add_argument("--disable-extensions")
@@ -55,6 +56,7 @@ def get_data(ccode):
                     break
             return [to_be_ret[0],to_be_ret[class_det_idx].strip()]
 
+notify=ToastNotifier()
 seats_not_open = True
 init_data = get_data(class_code)
 if init_data==-1:
@@ -66,11 +68,12 @@ else:
     print("Auto Refreshing Every 3 seconds...")
     print("You will be notified if any seat opens up")
     print("*****************************************")
-    while seats_not_open:
+    while True:
         data = get_data(class_code)
         print(data[1])
         print(data[0])
         print("-------------------------------------")
         seats_not_open= int(data[0].split('Seats Open: ')[-1].split(' of')[0])==0
         if(not seats_not_open):
+            notify.show_toast(title="AsuClassTracker ALERT!",msg=data[0],duration=2)
             print("Seats are Available!")
